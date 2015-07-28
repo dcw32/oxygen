@@ -20,6 +20,9 @@ h_max=80
 H=7
 #surface M, cm-3
 M_surf=2.5E19
+# oxygen ratio
+ratio = 0.21
+
 
 #Temperature
 T=np.zeros(nlevs)
@@ -44,19 +47,17 @@ height=np.linspace(h_max,h_min,nlevs)
 
 #Calculation of j rates, ozone)
 for i in range(nlevs):
-        o2[i]=0.21*M_surf*np.exp(-height[i]/H)
+        o2[i]=ratio*M_surf*np.exp(-height[i]/H)
 	I_factor=od(o2_c,o3_c,o2_running,o3_running)
 	I=sol*I_factor
 	I=np.array(I)
 	J_o2_s=np.multiply(o2_c,I)
 	J_o2[i]=np.sum(J_o2_s)
-	print J_o2[i]
 	J_o3_s=np.multiply(o3_c,I)
 	J_o3[i]=np.sum(J_o3_s)
-	print J_o3[i]
-	o3[i]=ozone(J_o2[i],J_o3[i],T[i],o2[i])
+	o3[i]=ozone(J_o2[i],J_o3[i],T[i],o2[i],ratio)
 	o2_running=o2_running+o2[i]*(1E5*h_max/(nlevs-1))	
 	o3_running=o3_running+o3[i]*(1E5*h_max/(nlevs-1))
-plt.semilogy(height,o3)
-#plt.plot(height,o2*1E-5)
+#plt.semilogy(height,o3)
+plt.plot(height,o3)
 plt.show()
