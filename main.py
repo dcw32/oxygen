@@ -5,7 +5,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from data import extract_csec
+from data import extract_csec,ncsave
 from optical_depth import od
 from j_rates import j
 from k_rates import k3_i,k4_i
@@ -13,13 +13,13 @@ from ozone_calc import ozone
 
 #Running options
 # oxygen ratio
-ratio = 0.20
+ratio = 0.4
 # debug mode
 debug = True
 
 #Constants
 #Number of atmospheric levels
-nlevs=101
+nlevs=1001
 #Height, km
 h_min=0
 h_max=50
@@ -30,9 +30,10 @@ M_surf=2.5E19*(ratio+0.79)
 
 
 #Temperature
-T=np.zeros(nlevs)
-T=np.linspace(270,180,nlevs)
-T[-6:]=np.linspace(T[-6],290,6)
+#T=np.zeros(nlevs)
+#T=np.linspace(270,180,nlevs)
+#T[-6:]=np.linspace(T[-6],290,6)
+T=291*np.ones(nlevs)
 
 # wavelength bins, interpolating o2 & solar onto o3 csec wavelengths
 wlen,o2_c,o3_c,sol=extract_csec()
@@ -83,6 +84,9 @@ for i in range(nlevs):
 #plt.semilogy(height,o3)
 #print np.divide(J_o2,J_o3)
 #print np.power(o2,3)/ratio
-print o3_running
-plt.plot(height,np.divide(J_o2,J_o3))
-plt.show()
+du=o3_running/2.69E16
+print str(du)+" DU Ozone Column"
+species='o3'
+ncsave(height,species,o3)
+#plt.plot(height,o3)
+#plt.show()

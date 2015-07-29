@@ -1,5 +1,6 @@
 from scipy import interpolate
 import numpy as np
+from netCDF4 import Dataset
 def extract_csec():
 	#Extraction of solar data
 	solar_data=np.loadtxt("solar.dat")
@@ -19,3 +20,10 @@ def extract_csec():
 	sol_fn=interpolate.interp1d(lambda_solr,solr)
 	sol_binned=sol_fn(lambda_bin)
 	return lambda_bin,o2_binned_csec,o3_binned_csec,sol_binned
+def ncsave(height,species,species_arr):
+	dataset=Dataset('netcdf/'+species+'.nc','w',format='NETCDF4')
+	dataset.createDimension('height',len(height))
+	heights=dataset.createVariable('height',np.float32,('height',))
+	heights[:]=height
+	spec=dataset.createVariable(species,np.float32,('height',))
+	spec[:]=species_arr
