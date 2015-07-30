@@ -8,3 +8,6 @@ def ozone(J_o2,J_o3,T,o2,ratio,k3,k4):
 		sys.exit(1)
 	o3=np.sqrt(q)
 	return o3,q
+def otp(o3,J_o3,k3,o2,ratio):
+	ot=o3*J_o3*ratio/(k3*o2*o2)
+	return ot
