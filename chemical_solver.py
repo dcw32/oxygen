@@ -31,9 +31,6 @@ def d1_init(d1defs,nlevs,ratio):
 	print d1
 	return d1
 def chem_ten(d1,d1defs,nlevs):
-	bimol=np.genfromtxt("bimol.dat",dtype='str',skiprows=2)
-	photo=np.genfromtxt("photol.dat",dtype='str',skiprows=2)
-	nrxns=len(bimol)+len(photo)
 	#Initialise array of chemical tendencies
 	#For each reaction in the scheme
 	chem_tend=np.zeros([nrxns,nlevs])
