@@ -1,7 +1,7 @@
 from scipy import interpolate
 import numpy as np
 from netCDF4 import Dataset
-def extract_csec():
+def extract_csec(heights):
 	#Extraction of solar data
 	solar_data=np.loadtxt("solar.dat")
 	lambda_solr,solr=solar_data[:,0],solar_data[:,1]
@@ -19,7 +19,11 @@ def extract_csec():
                 	o2_binned_csec[i]=0
 	sol_fn=interpolate.interp1d(lambda_solr,solr)
 	sol_binned=sol_fn(lambda_bin)
-	return lambda_bin,o2_binned_csec,o3_binned_csec,sol_binned
+	temp_data=np.loadtxt("temp.dat")
+	ht,temp=temp_data[:,0],temp_data[:,1]
+	temp_fn=interpolate.UnivariateSpline(ht,temp)
+	T=temp_fn(heights)
+	return lambda_bin,o2_binned_csec,o3_binned_csec,sol_binned,T
 def ncsave(height,species,species_arr):
 	dataset=Dataset('netcdf/'+species+'.nc','w',format='NETCDF4')
 	dataset.createDimension('height',len(height))
