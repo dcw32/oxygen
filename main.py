@@ -4,6 +4,7 @@
 # %run ./main.py
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider, Button, RadioButtons
 import sys
 
 from data import extract_csec,ncsave
@@ -21,13 +22,14 @@ ratio = 0.21
 debug = True
 # Steady state mode - can set up 'initial values' for chem scheme
 steadystate = True
-numerics = True
+interactive = True
+numerics = False
 # Chemical scheme: ChapmanSS, Chapman
 chem_scheme = 'Chapman'
 
 #Constants
 #Number of atmospheric levels
-nlevs=81
+nlevs=41
 #Height, km
 h_min=10
 h_max=50
@@ -60,7 +62,17 @@ o3_c=np.array(o3_c)
 
 if steadystate==True:
 	print "CALCULATING STEADY STATE OZONE COLUMN"
-	o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+	height,o3,o2,o,J_o2,J_o3,o2_sum,o3_sum=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+
+o3_running=o3_sum[nlevs-1]
+du=o3_running/2.69E16
+print du
+
+if interactive==True:
+	fig, ax = plt.subplots()
+	plt.subplots_adjust(bottom=0.25)
+	l,=plt.plot(height,o3)
+	plt.show()
 
 #height=np.linspace(h_max,h_min,nlevs)
 #o=np.zeros(nlevs)
@@ -98,5 +110,5 @@ if numerics==True:
 		print doz
 du=o3_running/2.69E16
 print str(du)+" DU Ozone Column"
-plt.plot(np.linspace(h_min,h_max,nlevs),d1[1,:])
-plt.show()
+#plt.plot(np.linspace(h_min,h_max,nlevs),d1[1,:])
+#plt.show()

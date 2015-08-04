@@ -36,9 +36,8 @@ def steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width):
         	o2_sum[i]=o2_running
         	o3_running=o3_running+o3[i]*(1E5*(h_max-h_min)/(nlevs-1))
         	o3_sum[i]=o3_running
-	plt.plot(height,o3)
-	plt.show()
+	plt.plot(height,J_o2)
 	ncsave(height,'O3',o3)
 	ncsave(height,'O2',o2)
 	ncsave(height,'O',o)
-	return o3_running
+	return height,o3,o2,o,J_o2,J_o3,o2_sum,o3_sum

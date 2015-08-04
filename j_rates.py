@@ -5,10 +5,10 @@ def j(I,o2_c,o3_c,jrate,bin_w):
 		j_spec=np.multiply(o2_c,I)
 		j_spec=np.multiply(j_spec,bin_w)
 		j_spec=np.sum(j_spec)
-		j_spec=100*j_spec
+		j_spec=j_spec
 	elif jrate=='JO3':
                 j_spec=np.multiply(o3_c,I)
                 j_spec=np.multiply(j_spec,bin_w)
                 j_spec=np.sum(j_spec)
-		j_spec=10000*j_spec
+		j_spec=j_spec
 	return j_spec	
