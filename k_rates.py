@@ -1,7 +1,8 @@
 import numpy as np
 import sys
 def k(krt,T,M):
-	if krt=='k3':
+	#k3 is really k3*[M] in order to make the equation quasi bimolecular
+	if krt=='k3M':
 	        k3=6E-34*(300/T)*(300/T)*M
         	return k3
 	elif krt=='k4':

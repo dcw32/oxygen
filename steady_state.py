@@ -15,7 +15,7 @@ def steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width):
 	o=np.zeros(nlevs)
 	J_o2=np.zeros(nlevs)
 	J_o3=np.zeros(nlevs)
-	k3=np.zeros(nlevs)
+	k3M=np.zeros(nlevs)
 	k4=np.zeros(nlevs)
 	q=np.zeros(nlevs)
 	height=np.linspace(h_max,h_min,nlevs)
@@ -28,12 +28,14 @@ def steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width):
         	I=np.array(sol*I_factor)
         	J_o2[i]=j(I,o2_c,o3_c,'JO2',sol_bin_width)
         	J_o3[i]=j(I,o2_c,o3_c,'JO3',sol_bin_width)
-        	k3[i]=k('k3',T[i],o2[i]/ratio)
+        	k3M[i]=k('k3M',T[i],o2[i]/ratio)
         	k4[i]=k('k4',T[i],o2[i]/ratio)
-        	o3[i],q[i]=ozone(J_o2[i],J_o3[i],T[i],o2[i],ratio,k3[i],k4[i])
-        	o[i]=otp(o3[i],J_o3[i],k3[i],o2[i],ratio)
+        	o3[i],q[i]=ozone(J_o2[i],J_o3[i],T[i],o2[i],ratio,k3M[i],k4[i])
+        	o[i]=otp(o3[i],J_o3[i],k3M[i],o2[i],ratio)
         	o2_running=o2_running+o2[i]*(1E5*(h_max-h_min)/(nlevs-1))
         	o2_sum[i]=o2_running
         	o3_running=o3_running+o3[i]*(1E5*(h_max-h_min)/(nlevs-1))
         	o3_sum[i]=o3_running
-	return height,o3,o2,o,J_o2,J_o3,o2_sum,o3_sum
+	#plt.plot(height,o3)
+	#plt.savefig('ozone.png')
+	return height,o3,o2,o,J_o2,J_o3,o3_running

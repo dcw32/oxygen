@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.text as txt
 from matplotlib.widgets import Slider, Button, RadioButtons
 import sys
+from pylab import *
 
 from data import extract_csec,ncsave
 from optical_depth import od_chems
@@ -23,7 +24,7 @@ ratio = 0.21
 debug = True
 # Steady state mode - can set up 'initial values' for chem scheme
 steadystate = True
-interactive = True
+interactive = False
 numerics = False
 # Chemical scheme: ChapmanSS, Chapman
 chem_scheme = 'Chapman'
@@ -57,9 +58,14 @@ o3_c=np.array(o3_c)
 
 if steadystate==True:
 	print "CALCULATING STEADY STATE OZONE COLUMN"
-	height,o3,o2,o,J_o2,J_o3,o2_sum,o3_sum=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+	height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
 
-	o3_running=o3_sum[nlevs-1]
+	fig0,axis=plt.subplots()
+	plt.plot(height,o3)
+	axis.set_xlabel('Altitude / km')
+	axis.set_ylabel('O3 concentration / cm-3')
+	plt.savefig('ozone.png')
+	fig0.clear
 	du=o3_running/2.69E16
 	print du
 
@@ -76,8 +82,8 @@ if steadystate==True:
 		l,=ax0.plot(height,o3/1E12)
 		m,=ax1.plot(height,J_o2*1E10,color='red')
 		n,=ax2.plot(height,J_o3*1E3,color='purple')
-		ann=txt.Annotation(str(int(round(du))), xy=(50,10),xycoords='data')		
-		ax0.add_artist(ann)
+		#ann=txt.Annotation(str(int(round(du))), xy=(50,10),xycoords='data')		
+		#ax0.add_artist(ann)
 		#Sets up sliders
 		axo2=plt.axes([0.25,0.1,0.65,0.03],axisbg='lightgoldenrodyellow')
 		so2=Slider(axo2, 'O\mathrm{_{2}}', 0.001, 1.00, valinit=0.21)
@@ -85,18 +91,32 @@ if steadystate==True:
 		def update(val):
 			ratio=so2.val
 			M_surf=2.5E19*(ratio+0.79)
-			height,o3,o2,o,J_o2,J_o3,o2_sum,o3_sum=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+			height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
 			m.set_ydata(J_o2*1E10)
 			l.set_ydata(o3/1E12)
 			n.set_ydata(J_o3*1E3)
-			du=o3_sum[nlevs-1]*(h_max-h_min)/2.69E11
-	                ax0.annotate(str(int(round(du))), xy=(0.99,0.01),xycoords='axes fraction',horizontalalignment='right', verticalalignment='bottom')
+			du=o3_running/2.69E16
+			print du
+	                #ax0.annotate(str(int(round(du))), xy=(0.99,0.01),xycoords='axes fraction',horizontalalignment='right', verticalalignment='bottom')
 			fig.canvas.draw_idle()
 		so2.on_changed(update)
 		plt.show()
 else:
 	if interactive==True:
 		print "Must run Steady State calc for Interactive Plotting routine"
+
+fig, ax=plt.subplots()
+for i in range(100):
+	ratio=0.01+0.01*i
+	M_surf=2.5E19*(ratio+0.79)
+	height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+	du=o3_running/2.69E16
+	plt.scatter(ratio,du,marker=".")
+ax.set_xlim([0,1])
+plt.xlabel(r'O2 ratio')
+plt.ylabel(r'Ozone Column / DU')
+#plt.show()
+plt.savefig('dobson.png')
 
 #height=np.linspace(h_max,h_min,nlevs)
 #o=np.zeros(nlevs)
