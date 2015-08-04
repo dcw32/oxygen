@@ -4,7 +4,7 @@ import numpy as np
 from k_rates import k
 from j_rates import j
 from optical_depth import od_chems
-def d2_calc(nrxns,nlevs,d1,bimol,T,photo,o2_c,o3_c,sol,sol_bin_width,d1defs,M,h_max):
+def d2_calc(nrxns,nlevs,d1,bimol,T,photo,o2_c,o3_c,sol,sol_bin_width,d1defs,M,h_max,h_min):
 #        print "CONSTRUCTING D2 ARRAY OF CHEMICAL TENDENCIES"
         d2=np.zeros([nrxns,nlevs])
         for i in range(len(bimol)):
@@ -18,7 +18,7 @@ def d2_calc(nrxns,nlevs,d1,bimol,T,photo,o2_c,o3_c,sol,sol_bin_width,d1defs,M,h_
   #              print "PHOTOLYTIC RXN"
                 spec=d1[np.where(d1defs==photo[i,0])[0][0],:]
                 j_rt=np.zeros(nlevs)
-                I=od_chems(d1,d1defs,o2_c,o3_c,sol,nlevs,len(sol),h_max)
+                I=od_chems(d1,d1defs,o2_c,o3_c,sol,nlevs,len(sol),h_max,h_min)
                 j_rt=j(I,o2_c,o3_c,photo[i,1],sol_bin_width)
                 d2[i+len(bimol)]=np.multiply(spec,j_rt)
 	return d2

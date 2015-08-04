@@ -21,15 +21,15 @@ ratio = 0.21
 debug = True
 # Steady state mode - can set up 'initial values' for chem scheme
 steadystate = True
-numerics = False
+numerics = True
 # Chemical scheme: ChapmanSS, Chapman
 chem_scheme = 'Chapman'
 
 #Constants
 #Number of atmospheric levels
-nlevs=11
+nlevs=81
 #Height, km
-h_min=0
+h_min=10
 h_max=50
 #scale height, km
 H=7
@@ -53,7 +53,7 @@ sol_bin_width=np.zeros(len(wlen))
 sol_bin_width[0]=2
 sol_bin_width[len(wlen)-1]=5
 for i in range(1,len(wlen)-2):
-	sol_bin_width[i]=0.5*(sol_bin_width[i+1]-sol_bin_width[i-1])
+        sol_bin_width[i]=0.5*(wlen[i+1]-wlen[i-1])
 
 o2_c=np.array(o2_c)
 o3_c=np.array(o3_c)
@@ -81,21 +81,22 @@ if numerics==True:
 #The D2 array contains the chemical tendencies for each reaction
 #There is a chemical tendency arising from each chemical reaction
 	from d_arrays import d2_calc,d3_calc
-	for i in range(200):
-		d2=d2_calc(nrxns,nlevs,d1,bimol,T,photo,o2_c,o3_c,sol,sol_bin_width,d1defs,d1[np.where(d1defs=='M')[0][0],:],h_max)
+	for i in range(100):
+		d2=d2_calc(nrxns,nlevs,d1,bimol,T,photo,o2_c,o3_c,sol,sol_bin_width,d1defs,d1[np.where(d1defs=='M')[0][0],:],h_max,h_min)
 		d3=d3_calc(d1defs,nlevs,bimol,photo,d2)
 		#print d3[1,:]
 		for i in range(len(d1defs[:,0])):
 			for j in range(nlevs):
-				d1[i,j]=d1[i,j]+360000*d3[i,j]
+				d1[i,j]=d1[i,j]+d3[i,j]
 				if d1[i,j]<0:
 					d1[i,j]=0
+		print d1
 		doz=d1[1,:]
-		doz=doz*(1E5*h_max/(nlevs-1))
+		doz=doz*(1E5*(h_max-h_min)/(nlevs-1))
 		doz=np.sum(doz)
 		doz=doz/2.69E16
-		print str(doz)
-#du=o3_running/2.69E16
-#print str(du)+" DU Ozone Column"
-#plt.plot(height,o3)
-#plt.show()
+		print doz
+du=o3_running/2.69E16
+print str(du)+" DU Ozone Column"
+plt.plot(np.linspace(h_min,h_max,nlevs),d1[1,:])
+plt.show()
