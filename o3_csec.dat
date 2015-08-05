@@ -1,5 +1,5 @@
-#Cross Section Data, O3
-#Adapted from JPL: lambda (nm), csec (cm2)
+#Cross Section Data, O3 - lambda / nm	csec / cm^2
+#Adapted from JPL-2010, obtained from MPI-Mainz UV/VIS Spectral Atlas
 201	3.15e-19
 203	3.26e-19
 205	3.63e-19

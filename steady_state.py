@@ -2,7 +2,6 @@
 # 
 from j_rates import j
 from k_rates import k
-from ozone_calc import ozone,otp
 from data import ncsave
 import numpy as np
 import matplotlib.pyplot as plt

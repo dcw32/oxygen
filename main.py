@@ -18,7 +18,7 @@ from d_arrays import d1_init,d2_calc,d3_calc
 
 #Running options
 # oxygen ratio
-ratio = 0.21
+ratio = 1E-6
 # debug mode
 debug = True
 # Steady state mode - can set up 'initial values' for chem scheme
@@ -104,18 +104,25 @@ else:
 	if interactive==True:
 		print "Must run Steady State calc for Interactive Plotting routine"
 
+ratios=np.logspace(-6,0,50)
+
 fig, ax=plt.subplots()
-for i in range(100):
-	ratio=0.01+0.01*i
+for i in range(len(ratios)):
+	ratio=ratios[i]
+	print ratio
 	M_surf=2.5E19*(ratio+0.79)
 	height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
-	du=o3_running/2.69E16
-	plt.scatter(ratio,du,marker=".")
-ax.set_xlim([0,1])
-plt.xlabel(r'O2 ratio')
-plt.ylabel(r'Ozone Column / DU')
+	du=o3_running
+#	du=o3_running/2.69E16
+	ratio=ratio/0.21
+	plt.scatter(ratio,du,marker="x",color='r')
+ax.set_xscale('log')
+#ax.set_xlim([0,1])
+ax.set_yscale('log')
+plt.xlabel(r'Oxygen Content (PAL)')
+plt.ylabel(r'Ozone Column / cm-2')
 #plt.show()
-plt.savefig('dobson.png')
+plt.savefig('dobson_log.png')
 
 #height=np.linspace(h_max,h_min,nlevs)
 #o=np.zeros(nlevs)
