@@ -123,6 +123,29 @@ plt.xlabel(r'Oxygen Content (PAL)')
 plt.ylabel(r'Ozone Column / cm-2')
 #plt.show()
 plt.savefig('dobson_log.png')
+plt.close()
+
+ratios=np.linspace(0.01,1.00,100)
+fig, ax=plt.subplots()
+for i in range(len(ratios)):
+        ratio=ratios[i]
+        print ratio
+        M_surf=2.5E19*(ratio+0.79)
+        height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+        du=o3_running
+        du=o3_running/2.69E16
+        ratio=ratio/0.21
+        plt.scatter(ratio,du,marker="x",color='purple')
+x,y=(1,1),(0,1000)
+plt.plot(x,y,color='k')
+ax.set_xlim([0,5])
+ax.set_ylim([550,800])
+plt.xlabel(r'Oxygen Content (PAL)')
+plt.ylabel(r'Ozone Column / DU')
+#plt.show()
+plt.savefig('dobson.png')
+plt.close()
+
 
 #height=np.linspace(h_max,h_min,nlevs)
 #o=np.zeros(nlevs)
