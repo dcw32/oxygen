@@ -13,9 +13,8 @@ from data import extract_csec,ncsave
 from optical_depth import od_chems
 from j_rates import j
 from k_rates import k
-from ozone_calc import ozone,otp
-from chemical_solver import d1_init
-from steady_state import steady
+from steady_state import steady,ozone,otp
+from d_arrays import d1_init,d2_calc,d3_calc
 
 #Running options
 # oxygen ratio
@@ -136,7 +135,6 @@ if numerics==True:
 	nrxns=len(bimol)+len(photo)
 #The D2 array contains the chemical tendencies for each reaction
 #There is a chemical tendency arising from each chemical reaction
-	from d_arrays import d2_calc,d3_calc
 	for i in range(100):
 		d2=d2_calc(nrxns,nlevs,d1,bimol,T,photo,o2_c,o3_c,sol,sol_bin_width,d1defs,d1[np.where(d1defs=='M')[0][0],:],h_max,h_min)
 		d3=d3_calc(d1defs,nlevs,bimol,photo,d2)

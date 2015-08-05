@@ -1,11 +1,5 @@
 # Calculated the optical depth
 import numpy as np
-#Optical Depth calculation in the steady_state_init
-#def od(o2_c,o3_c,o2_col,o3_col):
-#optical_depth=o2_c*o2_col+o3_c*o3_col
-#I_factor=np.exp(-optical_depth)
-#return I_factor
-#Optical Depth calculation for the D1 array
 def od_chems(d1,d1defs,o2_c,o3_c,sol,nlevs,wbins,h_max,h_min):
 	o2col=np.zeros([nlevs,wbins])
 	o3col=np.zeros([nlevs,wbins])

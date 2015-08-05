@@ -1,6 +1,12 @@
-#
-#
+# These functions construct the D arrays
+# D1 holds the concentrations of each chemical species in species.dat
+# This is initialised from values calculated in the steady state,
+# or from a given initial concentration, all in netCDF files
+# D2 holds the array of rates calculated for each rxn
+# D3 holds the array of chemical tendencies d[species]/dt, for each species.
 import numpy as np
+from netCDF4 import Dataset
+import os, sys
 from k_rates import k
 from j_rates import j
 from optical_depth import od_chems
@@ -43,3 +49,28 @@ def d3_calc(d1defs,nlevs,bimol,photo,d2):
          except:
           print "WARNING: SPECIES "+d1defs[i,0]+" NOT IN PHOTOL"
 	return d3
+def d1_init(d1defs,nlevs,ratio):
+	d1=np.zeros([len(d1defs[:,0]),nlevs])
+	for i in range(len(d1defs[:,0])):
+#Perhaps this could be substantially tidied up...
+		if d1defs[i,1]=='y':
+			file=Dataset('netcdf/'+d1defs[i,0]+'.nc')
+			species=file.variables[d1defs[i,0]][:]
+			d1[i,:]=species
+			file.close()
+                elif d1defs[i,0]=='O2':
+                        file=Dataset('netcdf/O2.nc')
+                        species=file.variables['O2'][:]
+                        d1[i,:]=species
+                        file.close()
+		elif d1defs[i,0]=='M':
+			file=Dataset('netcdf/O2.nc')
+			species=file.variables['O2'][:]
+			species=species/ratio
+			d1[i,:]=species
+			file.close()
+		else:
+			#Something's going catastrophically wrong
+			print >> sys.stderr, "ERROR: STEADY STATE SPECIES NOT DEFINED IN D1_INIT ARRAY"
+			sys.exit(1)
+	return d1
