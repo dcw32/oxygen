@@ -18,7 +18,7 @@ from d_arrays import d1_init,d2_calc,d3_calc
 
 #Running options
 # oxygen ratio
-ratio = 1E-6
+ratio = 0.21
 # debug mode
 debug = True
 # Steady state mode - can set up 'initial values' for chem scheme
@@ -63,10 +63,12 @@ if steadystate==True:
 	plt.plot(height,o3)
 	axis.set_xlabel('Altitude / km')
 	axis.set_ylabel('O3 concentration / cm-3')
-	plt.savefig('ozone.png')
 	fig0.clear
 	du=o3_running/2.69E16
-	print du
+	du=int(round(du))
+	axis.text(0.95,0.95,str(du)+" DU",horizontalalignment='right',verticalalignment='top',transform=axis.transAxes)
+	plt.title('Steady State Chapman - PAL Oxygen')
+	plt.savefig('ozone.png')
 
 #Interactive plot of ozone vs o2
 	if interactive==True:
