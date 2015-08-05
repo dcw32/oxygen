@@ -9,6 +9,8 @@ To Do:
 2. Improve chemical solver (forward Euler at present, proving to be a headache!)
 3. Include NOx chemistry
 
+Steady State Chapman Chemistry
 ![oxygen](https://github.com/dcw32/oxygen/raw/master/dobson.png)
+![oxygenlog](https://github.com/dcw32/oxygen/raw/master/dobson_log.png)
 
 Email dcw32-at-cam.ac.uk
