@@ -8,6 +8,8 @@ import matplotlib.text as txt
 from matplotlib.widgets import Slider, Button, RadioButtons
 import sys
 from pylab import *
+from netCDF4 import Dataset
+from scipy.integrate import odeint
 
 from data import extract_csec,ncsave
 from optical_depth import od_chems
@@ -24,6 +26,7 @@ ratio = 0.21
 steadystate = True
 interactive = False
 numerics = False
+new_numerics = True
 # Plotting scripts - plots oxygen vs ozone for a range of oxygen vals
 plot_on = True
 # Chemical scheme: ChapmanSS, Chapman
@@ -59,6 +62,7 @@ o3_c=np.array(o3_c)
 if steadystate==True:
 	print "CALCULATING STEADY STATE OZONE COLUMN"
 	height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+	ncsave(heights,'O3',o3)
 	altconc(height,o3,o3_running)
 
 #Interactive plot of ozone vs o2
@@ -101,6 +105,48 @@ if plot_on==True:
 	logoxyoz(nlevs,h_max,h_min,H,o2_c,o3_c,T,sol,sol_bin_width)
 	linoxyoz(nlevs,h_max,h_min,H,o2_c,o3_c,T,sol,sol_bin_width)
 
+if new_numerics==True:
+        file=Dataset('netcdf/O3.nc')
+        o3_init=file.variables['O3'][:]
+	print o3_init
+        file=Dataset('netcdf/O2.nc')
+        o2=file.variables['O2'][:]
+	M=o2/ratio
+        file=Dataset('netcdf/O.nc')
+        o_init=file.variables['O'][:]
+	o2_running=0
+	o3_running=0
+	o3=np.zeros(nlevs)
+	o=np.zeros(nlevs)
+	for i in range(nlevs):
+		k3M=k('k3M',T[i],M[i])
+		k4=k('k4',T[i],M[i])
+		optical_depth=o2_c*o2_running+o3_c*o3_running
+		I_factor=np.exp(-optical_depth)
+		I=np.array(sol*I_factor)
+		J2=j(I,o2_c,o3_c,'JO2',sol_bin_width)
+		J3=j(I,o2_c,o3_c,'JO3',sol_bin_width)
+		def f(y, t):
+			o3i=y[0]
+			oi=y[1]
+			f0=k3M*oi*o2[i]-(J3+k4*oi)*o3i
+			f1=2*J2*o2[i]+J3*o3i-(k3M*o2[i]+k4*o3i)*oi
+			return [f0, f1]
+		#initial conditions
+		o0=o_init[i]
+		o30=o3_init[i]
+		y0=[o30,o0]
+		t=np.linspace(0,3.1104E8,3600)
+		soln=odeint(f,y0,t)
+		soln=soln[len(t)-1,:]
+		o3[i]=soln[0]
+		o[i]=soln[1]
+		o3_running=o3_running+o3[i]*(1E5*(h_max-h_min)/(nlevs-1))
+		o2_running=o2_running+o2[i]*(1E5*(h_max-h_min)/(nlevs-1))
+	print o3
+	plt.plot(heights,o3_init)
+	plt.plot(heights,o3)
+	plt.savefig('new_numerics.png')
 if numerics==True:
 #The D1 array contains the chemical species concentrations
 #D1 metadata is contained in D1DEFS
