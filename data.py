@@ -19,11 +19,20 @@ def extract_csec(heights):
                 	o2_binned_csec[i]=0
 	sol_fn=interpolate.interp1d(lambda_solr,solr)
 	sol_binned=sol_fn(lambda_bin)
+	#convert sol to photons cm-2 s-1 nm-1 for binning
+	sol_binned=sol_binned/0.05
+	sol_bin_width=np.zeros(len(lambda_bin))
+	sol_bin_width[0]=2
+	sol_bin_width[len(lambda_bin)-1]=5
+	for i in range(1,len(lambda_bin)-2):
+        	sol_bin_width[i]=0.5*(lambda_bin[i+1]-lambda_bin[i-1])
 	temp_data=np.loadtxt("temp.dat")
 	ht,temp=temp_data[:,0],temp_data[:,1]
 	temp_fn=interpolate.UnivariateSpline(ht,temp)
 	T=temp_fn(heights)
-	return lambda_bin,o2_binned_csec,o3_binned_csec,sol_binned,T
+	o2_binned_csec=np.array(o2_binned_csec)
+	o3_binned_csec=np.array(o3_binned_csec)
+	return sol_bin_width,o2_binned_csec,o3_binned_csec,sol_binned,T
 def ncsave(height,species,species_arr):
 	dataset=Dataset('netcdf/'+species+'.nc','w',format='NETCDF4')
 	dataset.createDimension('height',len(height))

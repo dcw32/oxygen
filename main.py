@@ -25,16 +25,16 @@ ratio = 0.21
 # Steady state mode - can set up 'initial values' for chem scheme
 steadystate = True
 interactive = False
-numerics = True
+numerics = False
 new_numerics = False
 # Plotting scripts - plots oxygen vs ozone for a range of oxygen vals
-plot_on = False
-# Chemical scheme: ChapmanSS, Chapman
-chem_scheme = 'Chapman'
+plot_on = True
+## Chemical scheme: ChapmanSS, Chapman
+#chem_scheme = 'Chapman'
 
 #Constants
 #Number of atmospheric levels
-nlevs=41
+nlevs=161
 #Height, km
 h_min=0
 h_max=80
@@ -45,28 +45,11 @@ H=7
 M_surf=2.5E19*(ratio+0.79)
 
 # wavelength bins, interpolating o2 & solar onto o3 csec wavelengths, extract temps
-wlen,o2_c,o3_c,sol,T=extract_csec(heights)
-
-#convert sol to photons cm-2 s-1 nm-1 for binning
-sol=sol/0.05
-
-sol_bin_width=np.zeros(len(wlen))
-sol_bin_width[0]=2
-sol_bin_width[len(wlen)-1]=5
-for i in range(1,len(wlen)-2):
-        sol_bin_width[i]=0.5*(wlen[i+1]-wlen[i-1])
-
-o2_c=np.array(o2_c)
-o3_c=np.array(o3_c)
+sol_bin_width,o2_c,o3_c,sol,T=extract_csec(heights)
 
 if steadystate==True:
 	print "CALCULATING STEADY STATE OZONE COLUMN"
 	height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
-	ncsave(heights,'O3',o3)
-	ncsave(heights,'O',o)
-	ncsave(heights,'O2',o2)
-	M=o2/ratio
-	ncsave(heights,'M',M)
 	altconc(height,o3,o3_running)
 
 #Interactive plot of ozone vs o2
@@ -100,9 +83,6 @@ if steadystate==True:
 			fig.canvas.draw_idle()
 		so2.on_changed(update)
 		plt.show()
-else:
-	if interactive==True:
-		print "Must run Steady State calc for Interactive Plotting routine"
 
 if plot_on==True:
 	logoxyoz(nlevs,h_max,h_min,H,o2_c,o3_c,T,sol,sol_bin_width)
