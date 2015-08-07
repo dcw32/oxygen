@@ -37,7 +37,7 @@ chem_scheme = 'Chapman'
 nlevs=41
 #Height, km
 h_min=0
-h_max=50
+h_max=80
 heights=np.linspace(h_max,h_min,nlevs)
 #scale height, km
 H=7
