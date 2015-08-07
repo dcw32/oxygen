@@ -16,7 +16,7 @@ from optical_depth import od_chems
 from j_rates import j
 from k_rates import k
 from steady_state import steady,ozone,otp
-from d_arrays import d1_init,d2_calc_new,d3_calc_new
+from d_arrays import d2_calc_new,d3_calc_new
 from plotting import altconc,linoxyoz,logoxyoz
 
 #Running options
@@ -139,6 +139,7 @@ if new_numerics==True:
 		o30=o3_init[i]
 		y0=[o30,o0]
 		t=np.linspace(0,252E6,3600)
+		#There's probably a more efficient way to do this but meh
 		soln=odeint(f,y0,t)
 		soln=soln[len(t)-1,:]
 		o3[i]=soln[0]

@@ -1,6 +1,9 @@
 #This script calculates the J(O2) and J(O3) photolysis rates required in calculating the steady state ozone concentration
 import numpy as np
 def j(I,o2_c,o3_c,jrate,bin_w):
+#to add a rxn:
+#elif jrate=='JRATE':
+#	j_spec=value
 	if jrate=='JO2':
 		j_spec=np.multiply(o2_c,I)
 		j_spec=np.multiply(j_spec,bin_w)
