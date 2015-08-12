@@ -9,14 +9,14 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 import sys
 from pylab import *
 from netCDF4 import Dataset
-from scipy.integrate import odeint
+from scipy.integrate import odeint,ode
 
 from data import extract_csec,ncsave
-from optical_depth import od_chems
+from optical_depth import od_chems_new
 from j_rates import j
 from k_rates import k
 from steady_state import steady,ozone,otp
-from d_arrays import d2_calc_new,d3_calc_new
+from d_arrays import d2_calc_new,d3_calc_new,d2_calc,d3_calc
 from plotting import altconc,linoxyoz,logoxyoz
 
 #Running options
@@ -26,7 +26,7 @@ ratio = 0.21
 steadystate = True
 interactive = False
 numerics = False
-new_numerics = False
+new_numerics = True
 # Plotting scripts - plots oxygen vs ozone for a range of oxygen vals
 plot_on = True
 ## Chemical scheme: ChapmanSS, Chapman
@@ -49,7 +49,7 @@ sol_bin_width,o2_c,o3_c,sol,T=extract_csec(heights)
 
 if steadystate==True:
 	print "CALCULATING STEADY STATE OZONE COLUMN"
-	height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+	height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width,True)
 	altconc(height,o3,o3_running)
 
 #Interactive plot of ozone vs o2
@@ -74,7 +74,7 @@ if steadystate==True:
 		def update(val):
 			ratio=so2.val
 			M_surf=2.5E19*(ratio+0.79)
-			height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+			height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width,False)
 			m.set_ydata(J_o2*1E10)
 			l.set_ydata(o3/1E12)
 			n.set_ydata(J_o3*1E3)
@@ -109,16 +109,13 @@ if new_numerics==True:
 		J2=j(I,o2_c,o3_c,'JO2',sol_bin_width)
 		J3=j(I,o2_c,o3_c,'JO3',sol_bin_width)
 		def f(y, t):
-			o3i=y[0]
-			oi=y[1]
-			f0=k3M*oi*o2[i]-(J3+k4*oi)*o3i
-			f1=2*J2*o2[i]+J3*o3i-(k3M*o2[i]+k4*o3i)*oi
-			return [f0, f1]
+			g=[k3M*y[1]*o2[i]-(J3+k4*y[1])*y[0],2*J2*o2[i]+J3*y[0]-(k3M*o2[i]+k4*y[0])*y[1]]
+			return g
 		#initial conditions
 		o0=o_init[i]
 		o30=o3_init[i]
 		y0=[o30,o0]
-		t=np.linspace(0,252E6,3600)
+		t=np.linspace(0,8640000,2400)
 		#There's probably a more efficient way to do this but meh
 		soln=odeint(f,y0,t)
 		soln=soln[len(t)-1,:]
@@ -136,28 +133,54 @@ if numerics==True:
 	d1defs=np.genfromtxt("species.dat",dtype='str',skiprows=2)
 	#d1=d1_init(d1defs,nlevs,ratio)
 	d1={}
-	k=0
-	while k<len(d1defs[:,0]):
-	        D=Dataset('netcdf/'+d1defs[k,0]+'.nc')
-	        value=D.variables[d1defs[k,0]][:]
-	        key=d1defs[k,0]
+	y=0
+	while y<len(d1defs[:,0]):
+	        D=Dataset('netcdf/'+d1defs[y,0]+'.nc')
+	        value=D.variables[d1defs[y,0]][:]
+	        key=d1defs[y,0]
 	        d1[key]=value
-	        k+=1
+	        y+=1
+	print d1.__class__
 	bimol=np.genfromtxt("bimol.dat",dtype='str',skiprows=2)
 	photo=np.genfromtxt("photol.dat",dtype='str',skiprows=2)
 	nrxns=len(bimol)+len(photo)
+	nspec=len(d1defs[:,0])
 #The D2 array contains the chemical tendencies for each reaction
 #There is a chemical tendency arising from each chemical reaction
 	for i in range(1):
-		d2=d2_calc_new(nrxns,nlevs,d1,bimol,T,photo,o2_c,o3_c,sol,sol_bin_width,d1defs,d1['M'],h_max,h_min)
-		d3=d3_calc_new(d1defs,nlevs,bimol,photo,d2)
+		rates={}
+		for a in range(len(bimol)):
+			rates[a]=k(bimol[a,2],T[i],M[i])
+		I=od_chems_new(d1,d1defs,o2_c,o3_c,sol,nlevs,len(sol),h_max,h_min)
+		for a in range(len(photo)):
+			rates[a+len(bimol)]=j(I,o2_c,o3_c,photo[a,1],sol_bin_width)
+		print rates
+		def f(y, t):
+			for a in range(nspec):
+				sp=d1defs[a,0]
+				d3[sp]=y[a]
+				d2[sp]=0
+				for b in range(np.where(bimol==d1defs[a,0])[:][0].shape[0]):
+					rxno=np.where(bimol==d1defs[i,0])[0][j]
+					if np.where(bimol==d1defs[a,0])[1][b]<2:
+						d2[sp]=d2[sp]-d3[bimol[rxno,0]]*d3[bimol[rxno,1]]*rates[bimol[rxno,2]]
+					else:
+						d2[sp]=d2[sp]+d3[bimol[rxno,0]]*d3[bimol[rxno,1]]*rates[bimol[rxno,2]]
+			return d2
+		t=[0,3600,7200]
+		soln=ode(f).set_integrator('lsoda')
+		print soln
+		soln.integrate(soln,3600)
+#		soln=odeint(f,d1,t)
+		#d2=d2_calc_new(nrxns,nlevs,d1,bimol,T,photo,o2_c,o3_c,sol,sol_bin_width,d1defs,d1['M'],h_max,h_min)
+		#d3=d3_calc_new(d1defs,nlevs,bimol,photo,d2)
 		#print d3[1,:]
-		for i in range(len(d1defs[:,0])):
-			d1[d1defs[i,0]]=d1[d1defs[i,0]]+d3[d1defs[i,0]]
-		doz=d1['O3']
-		doz=doz*(1E5*(h_max-h_min)/(nlevs-1))
-		doz=np.sum(doz)
-		doz=doz/2.69E16
+		#for i in range(len(d1defs[:,0])):
+		#	d1[d1defs[i,0]]=d1[d1defs[i,0]]+d3[d1defs[i,0]]
+		#doz=d1['O3']
+		#doz=doz*(1E5*(h_max-h_min)/(nlevs-1))
+		#doz=np.sum(doz)
+		#doz=doz/2.69E16
 du=o3_running/2.69E16
 #plt.plot(np.linspace(h_min,h_max,nlevs),d1[1,:])
 #plt.show()

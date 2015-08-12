@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-def steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width):
+def steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width,init):
 	o3=np.zeros(nlevs)
 	o3_sum=np.zeros(nlevs)
 	o2=np.zeros(nlevs)
@@ -36,11 +36,12 @@ def steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width):
         	o2_sum[i]=o2_running
         	o3_running=o3_running+o3[i]*(1E5*(h_max-h_min)/(nlevs-1))
         	o3_sum[i]=o3_running
-        ncsave(height,'O3',o3)
-        ncsave(height,'O',o)
-        ncsave(height,'O2',o2)
-        M=o2/ratio
-        ncsave(height,'M',M)
+	if init==True:
+	        ncsave(height,'O3',o3)
+	        ncsave(height,'O',o)
+	        ncsave(height,'O2',o2)
+	        M=o2/ratio
+	        ncsave(height,'M',M)
 	#plt.plot(height,o3)
 	#plt.savefig('ozone.png')
 	return height,o3,o2,o,J_o2,J_o3,o3_running

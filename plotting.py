@@ -19,7 +19,7 @@ def linoxyoz(nlevs,h_max,h_min,H,o2_c,o3_c,T,sol,sol_bin_width):
 	for i in range(len(ratios)):
 	        ratio=ratios[i]
 	        M_surf=2.5E19*(ratio+0.79)
-	        height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+	        height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width,False)
 	        du=o3_running
 	        du=o3_running/2.69E16
 	        ratio=ratio/0.21
@@ -38,7 +38,7 @@ def logoxyoz(nlevs,h_max,h_min,H,o2_c,o3_c,T,sol,sol_bin_width):
 	for i in range(len(ratios)):
 	        ratio=ratios[i]
 	        M_surf=2.5E19*(ratio+0.79)
-	        height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width)
+	        height,o3,o2,o,J_o2,J_o3,o3_running=steady(nlevs,h_max,h_min,H,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width,False)
 	        du=o3_running
 	#       du=o3_running/2.69E16
 	        ratio=ratio/0.21
