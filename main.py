@@ -102,7 +102,7 @@ if new_numerics==True:
 	d1=d1_init(d1defs,nlevs,ratio)
 	o2=d1[np.where(d1defs=='O2')[0][0],:]
 	M=d1[np.where(d1defs=='M')[0][0],:]
-        d3=np.zeros([len(d1defs[:,0]),nlevs])
+        d3=np.zeros([nspec,nlevs])
 	for i in range(nlevs):
 		#Create dictionary of rates
                 rates={}
@@ -113,19 +113,26 @@ if new_numerics==True:
                         rates[a+len(bimol)]=j(I,o2_c,o3_c,photo[a,1],sol_bin_width)
 		#Define function for chemical tendencies
 		def f(y, t):
-			g=[rates[0]*y[1]*o2[i]-(rates[3]+rates[1]*y[1])*y[0],2*rates[2]*o2[i]+rates[3]*y[0]-(rates[0]*o2[i]+rates[1]*y[0])*y[1]]
+			g=np.empty(4)
+			for spec in range(nspec):
+				if d1defs[spec,1]=='n':
+					g[spec]=0.0
+				elif d1defs[spec,0]=='O3':
+					g[spec]=0.0
+					g[spec]=g[spec]+rates[0]*y[2]*o2[i]-(rates[3]+rates[1]*y[2])*y[1]
+				elif d1defs[spec,0]=='O':
+					g[spec]=2*rates[2]*o2[i]+rates[3]*y[1]-(rates[0]*o2[i]+rates[1]*y[1])*y[2]
 			return g
-		#initial conditions
-		y0=[d1[np.where(d1defs=='O3')[0][0],i],d1[np.where(d1defs=='O')[0][0],i]]
-		time_tot=8640
+		#set up times
+		time_tot=7200
 		t=np.linspace(0,time_tot,time_tot/3600)
 		#solution provides a time series, take the final value
-		soln=odeint(f,y0,t)
+		soln=odeint(f,d1[:,i],t)
 		soln=soln[len(t)-1,:]
 		if i==0:
 			print soln
-		d3[np.where(d1defs=='O3')[0][0],i]=soln[0]
-                d3[np.where(d1defs=='O')[0][0],i]=soln[1]
+		d3[np.where(d1defs=='O3')[0][0],i]=soln[1]
+                d3[np.where(d1defs=='O')[0][0],i]=soln[2]
 		o3_running=o3_running+d3[np.where(d1defs=='O3')[0][0],i]*box_h
 		o2_running=o2_running+d1[np.where(d1defs=='O2')[0][0],i]*box_h
 	#print d3[np.where(d1defs=='O3')[0][0],:]
