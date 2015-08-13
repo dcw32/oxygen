@@ -92,36 +92,46 @@ if plot_on==True:
 if new_numerics==True:
 	o2_running=0
 	o3_running=0
-	o3=np.zeros(nlevs)
-	o=np.zeros(nlevs)
+#	o3=np.zeros(nlevs)
+#	o=np.zeros(nlevs)
         d1defs=np.genfromtxt("species.dat",dtype='str',skiprows=2)
         bimol=np.genfromtxt("bimol.dat",dtype='str',skiprows=2)
         photo=np.genfromtxt("photol.dat",dtype='str',skiprows=2)
-        nrxns=len(bimol)+len(photo)
+#        nrxns=len(bimol)+len(photo)
         nspec=len(d1defs[:,0])
 	d1=d1_init(d1defs,nlevs,ratio)
-	o2=d1[np.where(d1defs=='O2')[0][0],:]
+#	o2=d1[np.where(d1defs=='O2')[0][0],:]
 	M=d1[np.where(d1defs=='M')[0][0],:]
         d3=np.zeros([nspec,nlevs])
 	for i in range(nlevs):
 		#Create dictionary of rates
                 rates={}
                 for a in range(len(bimol)):
-                        rates[a]=k(bimol[a,2],T[i],M[i])
+                        rates[bimol[a,2]]=k(bimol[a,2],T[i],M[i])
                 I=od_chems(o2_running,o3_running,o2_c,o3_c,sol)
                 for a in range(len(photo)):
-                        rates[a+len(bimol)]=j(I,o2_c,o3_c,photo[a,1],sol_bin_width)
+                        rates[photo[a,1]]=j(I,o2_c,o3_c,photo[a,1],sol_bin_width)
 		#Define function for chemical tendencies
 		def f(y, t):
-			g=np.empty(4)
+			g=np.empty(nspec)
 			for spec in range(nspec):
 				if d1defs[spec,1]=='n':
 					g[spec]=0.0
-				elif d1defs[spec,0]=='O3':
+				else:
 					g[spec]=0.0
-					g[spec]=g[spec]+rates[0]*y[2]*o2[i]-(rates[3]+rates[1]*y[2])*y[1]
-				elif d1defs[spec,0]=='O':
-					g[spec]=2*rates[2]*o2[i]+rates[3]*y[1]-(rates[0]*o2[i]+rates[1]*y[1])*y[2]
+					for bi in range(np.where(bimol==d1defs[spec,0])[:][0].shape[0]):
+						rxno=np.where(bimol==d1defs[spec,0])[0][bi]
+						if np.where(bimol==d1defs[spec,0])[1][bi]<2:
+							g[spec]-=y[np.where(d1defs==bimol[rxno,0])[0][0]]*y[np.where(d1defs==bimol[rxno,1])[0][0]]*rates[bimol[rxno,2]]
+						else:
+                                                        g[spec]+=y[np.where(d1defs==bimol[rxno,0])[0][0]]*y[np.where(d1defs==bimol[rxno,1])[0][0]]*rates[bimol[rxno,2]]
+
+					for pho in range(np.where(photo==d1defs[spec,0])[:][0].shape[0]):
+						rxno=np.where(photo==d1defs[spec,0])[0][pho]
+						if np.where(photo==d1defs[spec,0])[1][pho]<1:
+							g[spec]-=y[np.where(d1defs==photo[rxno,0])[0][0]]*rates[photo[rxno,1]]
+						else:
+                                                        g[spec]+=y[np.where(d1defs==photo[rxno,0])[0][0]]*rates[photo[rxno,1]]
 			return g
 		#set up times
 		time_tot=7200
