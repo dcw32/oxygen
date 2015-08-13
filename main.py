@@ -16,20 +16,20 @@ from optical_depth import od_chems_new,od_chems
 from j_rates import j
 from k_rates import k
 from steady_state import steady,ozone,otp
-from d_arrays import d2_calc,d3_calc,d1_init
+from d_arrays import d1_init
 from plotting import altconc,linoxyoz,logoxyoz
 
-#Running options
-# oxygen ratio
+# Running options
+# Oxygen ratio
 ratio = 0.21
 # Steady state mode - can set up 'initial values' for chem scheme
 steadystate = True
-interactive = False
-new_numerics = True
 # Plotting scripts - plots oxygen vs ozone for a range of oxygen vals
 plot_on = True
-## Chemical scheme: ChapmanSS, Chapman
-#chem_scheme = 'Chapman'
+# Interactive plotting tool for steady state chapman chemistry
+interactive = False
+# Numerical ODE solver
+new_numerics = True
 
 #Constants
 #Number of atmospheric levels
@@ -85,40 +85,40 @@ if steadystate==True:
 		so2.on_changed(update)
 		plt.show()
 
-if plot_on==True:
-	logoxyoz(nlevs,h_max,h_min,H,o2_c,o3_c,T,sol,sol_bin_width)
-	linoxyoz(nlevs,h_max,h_min,H,o2_c,o3_c,T,sol,sol_bin_width)
+	if plot_on==True:
+		logoxyoz(nlevs,h_max,h_min,H,o2_c,o3_c,T,sol,sol_bin_width)
+		linoxyoz(nlevs,h_max,h_min,H,o2_c,o3_c,T,sol,sol_bin_width)
 
 if new_numerics==True:
 	o2_running=0
 	o3_running=0
-#	o3=np.zeros(nlevs)
-#	o=np.zeros(nlevs)
         d1defs=np.genfromtxt("species.dat",dtype='str',skiprows=2)
         bimol=np.genfromtxt("bimol.dat",dtype='str',skiprows=2)
         photo=np.genfromtxt("photol.dat",dtype='str',skiprows=2)
-#        nrxns=len(bimol)+len(photo)
         nspec=len(d1defs[:,0])
 	d1=d1_init(d1defs,nlevs,ratio)
-#	o2=d1[np.where(d1defs=='O2')[0][0],:]
 	M=d1[np.where(d1defs=='M')[0][0],:]
         d3=np.zeros([nspec,nlevs])
 	for i in range(nlevs):
-		#Create dictionary of rates
+# Create dictionary of rates
                 rates={}
                 for a in range(len(bimol)):
                         rates[bimol[a,2]]=k(bimol[a,2],T[i],M[i])
                 I=od_chems(o2_running,o3_running,o2_c,o3_c,sol)
                 for a in range(len(photo)):
                         rates[photo[a,1]]=j(I,o2_c,o3_c,photo[a,1],sol_bin_width)
-		#Define function for chemical tendencies
+# Define function for chemical tendencies
 		def f(y, t):
 			g=np.empty(nspec)
+# Loop through chemical species
 			for spec in range(nspec):
+# Set to zero if species constant, e.g. M, O2
 				if d1defs[spec,1]=='n':
 					g[spec]=0.0
 				else:
 					g[spec]=0.0
+# Add chemical tendency for a bimolecular rxn
+# np.where(bimol==d1defs[spec,0])[:][0].shape[0] is the number of times spec appears in bimol	
 					for bi in range(np.where(bimol==d1defs[spec,0])[:][0].shape[0]):
 						rxno=np.where(bimol==d1defs[spec,0])[0][bi]
 						if np.where(bimol==d1defs[spec,0])[1][bi]<2:
@@ -139,8 +139,6 @@ if new_numerics==True:
 		#solution provides a time series, take the final value
 		soln=odeint(f,d1[:,i],t)
 		soln=soln[len(t)-1,:]
-		if i==0:
-			print soln
 		d3[np.where(d1defs=='O3')[0][0],i]=soln[1]
                 d3[np.where(d1defs=='O')[0][0],i]=soln[2]
 		o3_running=o3_running+d3[np.where(d1defs=='O3')[0][0],i]*box_h
@@ -149,3 +147,4 @@ if new_numerics==True:
 	#print o3_init
 	plt.plot(heights,(d1[np.where(d1defs=='O3')[0][0],:]-d3[np.where(d1defs=='O3')[0][0],:])/d1[np.where(d1defs=='O3')[0][0],:])
 	plt.savefig('new_numerics.png')
+	print d3[np.where(d1defs=='H2O')[0][0],:]
