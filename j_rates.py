@@ -14,4 +14,8 @@ def j(I,jrate,constants):
                 j_spec=np.multiply(j_spec,constants['sol_bin_width'])
                 j_spec=np.sum(j_spec)
 		j_spec=j_spec
+	elif jrate=='JNO2':
+		j_spec=1E-2
+	else:
+		print "ERROR: J RATE NOT DEFINED"
 	return j_spec	

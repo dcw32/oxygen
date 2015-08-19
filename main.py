@@ -80,11 +80,22 @@ if new_numerics==True:
 	constants['M']=constants['M_surf']*np.exp(-constants['heights']/constants['H'])
 	print "RUNNING NUMERICAL SOLVER"
 	d1defs,d1,d3=solve(constants)
-	plt.plot(heights,(d1[np.where(d1defs=='O3')[0][0],:]\
-                  -d3[np.where(d1defs=='O3')[0][0],:])\
-                  /d1[np.where(d1defs=='O3')[0][0],:])
-	plt.savefig('new_numerics.png')
-	print d3[np.where(d1defs=='H2O')[0][0],:]
+	#plt.plot(heights,(d3[np.where(d1defs=='O3')[0][0],:]\
+        #          -d1[np.where(d1defs=='O3')[0][0],:])\
+        #          /d1[np.where(d1defs=='O3')[0][0],:])
+	#plt.savefig('new_numerics.png')
+        o3=d1[np.where(d1defs=='O3')[0][0],:]
+        plt.plot(heights,d3[np.where(d1defs=='O3')[0][0],:])
+	plt.plot(heights,d1[np.where(d1defs=='O3')[0][0],:])
+	plt.show()
+	o3=o3*constants['box_h']
+        du=np.sum(o3)/2.69E16
+        print du
+	o3=d3[np.where(d1defs=='O3')[0][0],:]
+	o3=o3*constants['box_h']
+	du=np.sum(o3)/2.69E16
+	print du
+	#print d3[np.where(d1defs=='H2O')[0][0],:]
 
 #######################################################################################
 # END

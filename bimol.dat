@@ -2,3 +2,5 @@
 #
 O	O2	k3M	O3	X	X	X	
 O	O3	k4	O2	O2	X	X
+NO	O3	k5	NO2	O2	X	X
+NO2	O	k6	NO	O2	X	X
