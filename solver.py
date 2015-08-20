@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.integrate import odeint
 from netCDF4 import Dataset
+import sys
 
 from k_rates import k
 from j_rates import j
@@ -65,10 +66,9 @@ def solve(constants):
                 *rates[photo[rxno,1]]
    return g
 # Set up times
-  time_tot=3.1104E9
-  t=np.linspace(0,time_tot,time_tot/3600)
+  t=np.linspace(0,5.174E6,5.174E6)
 #solution provides a time series, take the final value
-  soln=odeint(f,d1[:,i],t)
+  soln,hi=odeint(f,d1[:,i],t,full_output=1)
   soln=soln[len(t)-1,:]
   d3[:,i]=soln
   o3_running=o3_running+d3[np.where(d1defs=='O3')[0][0],i]*constants['box_h']

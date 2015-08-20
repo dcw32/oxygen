@@ -8,12 +8,16 @@ def j(I,jrate,constants):
 		j_spec=np.multiply(constants['o2_c'],I)
 		j_spec=np.multiply(j_spec,constants['sol_bin_width'])
 		j_spec=np.sum(j_spec)
-		j_spec=j_spec
 	elif jrate=='JO3':
-                j_spec=np.multiply(constants['o3_c'],I)
+		j_spec=np.multiply(constants['o3_c'],1-constants['o3_q'])
+                j_spec=np.multiply(j_spec,I)
                 j_spec=np.multiply(j_spec,constants['sol_bin_width'])
                 j_spec=np.sum(j_spec)
-		j_spec=j_spec
+	elif jrate=='JO1D':
+		j_spec=np.multiply(constants['o3_c'],constants['o3_q'])
+		j_spec=np.multiply(j_spec,I)
+		j_spec=np.multiply(j_spec,constants['sol_bin_width'])
+		j_spec=np.sum(j_spec)
 	elif jrate=='JNO2':
 		j_spec=1E-2
 	else:

@@ -10,6 +10,8 @@ def extract_csec(heights):
 	lambda_o2,o2_csec=o2_data[:,0],o2_data[:,1]
 	o3_data=np.loadtxt("o3_csec.dat",skiprows=2)
 	lambda_bin,o3_binned_csec=o3_data[:,0],o3_data[:,1]
+	o3phi_data=np.loadtxt("o3_qyield.dat",skiprows=2)
+	o3_qyield=o3phi_data[:,1]
 	# Interpolate solar fluxes and o2 onto o3 lambda vals
 	lambda_max_o2=np.max(lambda_o2)
 	o2_fn=interpolate.UnivariateSpline(lambda_o2,o2_csec)
@@ -32,7 +34,7 @@ def extract_csec(heights):
 	T=temp_fn(heights)
 	o2_binned_csec=np.array(o2_binned_csec)
 	o3_binned_csec=np.array(o3_binned_csec)
-	return sol_bin_width,o2_binned_csec,o3_binned_csec,sol_binned,T
+	return sol_bin_width,o2_binned_csec,o3_binned_csec,sol_binned,T,o3_qyield
 def ncsave(height,species,species_arr):
 	dataset=Dataset('netcdf/'+species+'.nc','w',format='NETCDF4')
 	dataset.createDimension('height',len(height))

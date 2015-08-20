@@ -14,9 +14,9 @@ from solver import solve
 
 print "STARTING PROGRAM OXYGEN"
 
-#################################################################################
+################################################################################
 # RUNNING OPTIONS
-#################################################################################
+################################################################################
 
 # Oxygen ratio
 ratio = 0.21
@@ -45,19 +45,19 @@ M=M_surf*np.exp(-heights/H)
 box_h=(1E5*(h_max-h_min)/(nlevs-1))
 
 # wavelength bins, interpolating o2 & solar onto o3 csec wavelengths, extract temps
-sol_bin_width,o2_c,o3_c,sol,T=extract_csec(heights)
+sol_bin_width,o2_c,o3_c,sol,T,o3_q=extract_csec(heights)
 
 # Creates a dictionary with all the constants
 constants={}
-key=['H','nlevs','heights','M_surf','ratio','o2_c','o3_c','T','sol','sol_bin_width','box_h','M']
-vals=[H,nlevs,heights,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width,box_h,M]
+key=['H','nlevs','heights','M_surf','ratio','o2_c','o3_c','T','sol','sol_bin_width','box_h','M','o3_q']
+vals=[H,nlevs,heights,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width,box_h,M,o3_q]
 
 for i in range(len(key)):
 	constants[key[i]]=vals[i]
 
-###################################################################################
+################################################################################
 # MAIN ROUTINES
-###################################################################################
+################################################################################
 
 if steadystate==True:
 	print "CALCULATING STEADY STATE OZONE COLUMN (CHAPMAN)"
@@ -97,7 +97,8 @@ if new_numerics==True:
 	print du
 	#print d3[np.where(d1defs=='H2O')[0][0],:]
 
-#######################################################################################
+################################################################################
 # END
-#######################################################################################
+################################################################################
+
 print "END OF PROGRAM"
