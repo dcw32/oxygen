@@ -10,7 +10,7 @@ def j(I,jrate,constants):
 		j_spec=np.sum(j_spec)
 	elif jrate=='JO3':
 		j_spec=np.multiply(constants['o3_c'],1-constants['o3_q'])
-                j_spec=np.multiply(j_spec,I)
+                j_spec=np.multiply(jspec,I)
                 j_spec=np.multiply(j_spec,constants['sol_bin_width'])
                 j_spec=np.sum(j_spec)
 	elif jrate=='JO1D':
@@ -18,8 +18,15 @@ def j(I,jrate,constants):
 		j_spec=np.multiply(j_spec,I)
 		j_spec=np.multiply(j_spec,constants['sol_bin_width'])
 		j_spec=np.sum(j_spec)
+	elif jrate=='H2O2':
+		j_spec=np.multiply(constants['h2o2_c'],I)
+		
+	elif jrate=='ClONO2':
+		
 	elif jrate=='JNO2':
 		j_spec=1E-2
+	elif jrate=='JNO3':
+		j_spec=0.156
 	else:
 		print "ERROR: J RATE NOT DEFINED"
 	return j_spec	
