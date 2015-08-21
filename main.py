@@ -5,7 +5,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from data import extract_csec,ncsave
+from data import extract_csec,ncsave,savetonetcdf
 from j_rates import j
 from k_rates import k
 from steady_state import steady,ozone,otp
@@ -21,9 +21,9 @@ print "STARTING PROGRAM OXYGEN"
 # Oxygen ratio
 ratio = 0.21
 # Steady state mode - can set up 'initial values' for chem scheme
-steadystate = False
+steadystate = True
 # Plotting scripts - plots oxygen vs ozone for a range of oxygen vals
-plot_on = False
+plot_on = True
 # Interactive plotting tool for steady state chapman chemistry
 interactive = False
 # Numerical ODE solver
@@ -45,16 +45,17 @@ M=M_surf*np.exp(-heights/H)
 box_h=(1E5*(h_max-h_min)/(nlevs-1))
 
 # wavelength bins, interpolating o2 & solar onto o3 csec wavelengths, extract temps
-sol_bin_width,o2_c,o3_c,sol,T,o3_q=extract_csec(heights)
+constants=extract_csec(heights)
 
 # Creates a dictionary with all the constants
-constants={}
-key=['H','nlevs','heights','M_surf','ratio','o2_c','o3_c','T','sol','sol_bin_width','box_h','M','o3_q']
-vals=[H,nlevs,heights,M_surf,ratio,o2_c,o3_c,T,sol,sol_bin_width,box_h,M,o3_q]
+key=['H','nlevs','heights','M_surf','ratio','box_h','M']
+vals=[H,nlevs,heights,M_surf,ratio,box_h,M]
 
 for i in range(len(key)):
 	constants[key[i]]=vals[i]
 
+#plt.plot(constants['lambda'],constants['o2_c'])
+#plt.show()
 ################################################################################
 # MAIN ROUTINES
 ################################################################################
@@ -80,6 +81,7 @@ if new_numerics==True:
 	constants['M']=constants['M_surf']*np.exp(-constants['heights']/constants['H'])
 	print "RUNNING NUMERICAL SOLVER"
 	d1defs,d1,d3=solve(constants)
+	savetonetcdf(constants,d1defs,d1,d3)
 	#plt.plot(heights,(d3[np.where(d1defs=='O3')[0][0],:]\
         #          -d1[np.where(d1defs=='O3')[0][0],:])\
         #          /d1[np.where(d1defs=='O3')[0][0],:])

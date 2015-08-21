@@ -2,6 +2,7 @@ import numpy as np
 from scipy.integrate import odeint
 from netCDF4 import Dataset
 import sys
+import os
 
 from k_rates import k
 from j_rates import j
@@ -14,11 +15,26 @@ def solve(constants):
  photo=np.genfromtxt("photol.dat",dtype='str',skiprows=2)
  nspec=len(d1defs[:,0])
  d1=np.zeros([len(d1defs[:,0]),constants['nlevs']])
+ file=Dataset('netcdf/initial.nc')
  for i in range(len(d1defs[:,0])):
-  file=Dataset('netcdf/'+d1defs[i,0]+'.nc')
+  #if os.path.isfile('netcdf/'+d1defs[i,0]+'.nc')==True:
+  #file=Dataset('netcdf/initial.nc')
   species=file.variables[d1defs[i,0]][:]
   d1[i,:]=species
-  file.close()
+  #else:
+  # sys.exit("SPECIES "+d1defs[i,0]+" IS NOT INITIALISED")
+ for i in range(len(bimol[:,0])):
+  for a in [0,1,3,4,5,6]:
+   if bimol[i,a] in d1defs[:,0] or bimol[i,a]=='X':
+    pass
+   else:
+    sys.exit("SPECIES "+bimol[i,a]+" IN BIMOL RXN BUT NOT IN SPECIES.DAT")
+ for i in range(len(photo[:,0])):
+  for a in [0,2,3,4,5]:
+   if photo[i,a] in d1defs[:,0] or photo[i,a]=='X':
+    pass
+   else:
+    sys.exit("SPECIES "+photo[i,a]+" IN PHOTOL RXN BUT NOT IN SPECIES.DAT")
  #M=d1[np.where(d1defs=='M')[0][0],:]
  d3=np.zeros([nspec,constants['nlevs']])
  for i in range(constants['nlevs']):

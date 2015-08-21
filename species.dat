@@ -9,6 +9,12 @@ NO	y
 NO2	y
 OH	y
 HO2	y
-H2O	y
+H2O	n
 Cl	y
 ClO	y
+ClONO2	y
+NO3	y
+H2O2	y
+N2O	n
+HNO3	y
+CH4	n

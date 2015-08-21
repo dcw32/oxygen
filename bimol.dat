@@ -10,9 +10,14 @@ OH      O3      k8      HO2     O2      X       X
 HO2     O       k9      OH      O2      X       X
 HO2     NO      k10     NO2     OH      X       X
 HO2     O3      k11     OH      O2      O2      X
-HO2     HO2     k12     O2      X       X       X
+HO2     HO2     k12     O2      H2O2    X       X
 OH	OH	k13	H2O	O	X	X
 Cl	O3	k14	ClO	O2	X	X
 ClO	O	k15	Cl	O2	X	X
 ClO	NO	k16	NO2	Cl	X	X
 ClO	NO2	k17M	ClONO2	X	X	X
+O1D	N2O	k18	NO	NO	X	X
+O1D	N2O	k19	O2	X	X	X
+OH	NO2	k20	HNO3	X	X	X
+OH	CH4	k21	H2O	X	X	X
+HNO3	OH	k22	H2O	NO3	X	X
