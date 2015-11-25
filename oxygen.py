@@ -22,9 +22,9 @@ ratio = 0.21
 # Steady state mode - can set up 'initial values' for chem scheme
 steadystate = True
 # Plotting scripts - plots oxygen vs ozone for a range of oxygen vals
-plot_on = True
+plot_on = False
 # Interactive plotting tool for steady state chapman chemistry
-interactive = True
+interactive = False
 # Numerical ODE solver
 new_numerics = False
 

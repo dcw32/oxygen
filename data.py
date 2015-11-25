@@ -3,18 +3,18 @@ import numpy as np
 from netCDF4 import Dataset
 def extract_csec(heights):
 	#Extraction of solar data
-	solar_data=np.loadtxt("solar.dat")
+	solar_data=np.loadtxt("c_secs/solar.dat")
 	lambda_solr,solr=solar_data[:,0],solar_data[:,1]
 	#Extraction of cross-sections
-	o2_data=np.loadtxt("o2_csec.dat",skiprows=2)
+	o2_data=np.loadtxt("c_secs/o2_csec.dat",skiprows=2)
 	lambda_o2,o2_csec=o2_data[:,0],o2_data[:,1]
-	o3_data=np.loadtxt("o3_csec.dat",skiprows=2)
+	o3_data=np.loadtxt("c_secs/o3_csec.dat",skiprows=2)
 	lambda_bin,o3_binned_csec=o3_data[:,0],o3_data[:,1]
-	o3phi_data=np.loadtxt("o3_qyield.dat",skiprows=2)
+	o3phi_data=np.loadtxt("c_secs/o3_qyield.dat",skiprows=2)
 	o3_qyield=o3phi_data[:,1]
-	h2o2_data=np.loadtxt("h2o2_csec.dat",skiprows=2)
+	h2o2_data=np.loadtxt("c_secs/h2o2_csec.dat",skiprows=2)
 	lambda_h2o2,h2o2_csec=h2o2_data[:,0],h2o2_data[:,1]
-        clono2_data=np.loadtxt("clono2_csec.dat",skiprows=2)
+        clono2_data=np.loadtxt("c_secs/clono2_csec.dat",skiprows=2)
         lambda_clono2,clono2_csec=clono2_data[:,0],clono2_data[:,1]
 	# Interpolate solar fluxes and o2 onto o3 lambda vals
 	lambda_max_o2=np.max(lambda_o2)
