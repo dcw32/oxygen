@@ -2,10 +2,10 @@
 # 
 from j_rates import j
 from k_rates import k
-from data import ncsave
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+from netCDF4 import Dataset
 
 def steady(constants,init):
 	o3=np.zeros(constants['nlevs'])
@@ -29,24 +29,24 @@ def steady(constants,init):
         	J_o3[i]=j(I,'JO3',constants)
         	k3M[i]=k('k3M',constants,i)
         	k4[i]=k('k4',constants,i)
-        	o3[i],q[i]=ozone(J_o2[i],J_o3[i],k3M[i],k4[i],o2[i])
+        	o3[i],q[i]=ozone(J_o2[i],J_o3[i],k3M[i],k4[i],o2[i],constants['M'][i])
         	o[i]=otp(o3[i],J_o3[i],k3M[i],o2[i])
         	o2_running=o2_running+o2[i]*constants['box_h']
         	o2_sum[i]=o2_running
         	o3_running=o3_running+o3[i]*constants['box_h']
         	o3_sum[i]=o3_running
 	if init==True:
-	        ncsave(constants['heights'],'O3',o3)
-	        ncsave(constants['heights'],'O',o)
-	        ncsave(constants['heights'],'O2',o2)
-	        ncsave(constants['heights'],'M',constants['M'])
+		file=Dataset('netcdf/initial.nc','r+')
+		file.variables['O3'][:]=o3
+		file.variables['O'][:]=o
+		file.variables['O2'][:]=o2
+		file.variables['M'][:]=constants['M']
 	#plt.plot(constants['heights'],o3)
 	#plt.savefig('ozone.png')
 	return o3,o2,o,J_o2,J_o3,o3_running
 # This routine calculates the ozone at the model level, given an overhead ozone column, photolysis rates and rate constants
-def ozone(J_o2,J_o3,k3M,k4,o2):
-	#[O3]ss=(J(O2)*k3*[M]*[O2]^2/J(O3)*k4)^0.5
-	q=(J_o2/J_o3)*(k3M/k4)*np.power(o2,2)
+def ozone(J_o2,J_o3,k3M,k4,o2,M):
+	q=(J_o2/J_o3)*(k3M/k4)*o2*M*0.42
 	if q<0:
 		print >> sys.stderr, "NEGATIVE Q VALUE"
 		sys.exit(1)

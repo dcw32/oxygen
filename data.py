@@ -41,6 +41,7 @@ def extract_csec(heights):
 	sol_binned=sol_fn(lambda_bin)
 	#convert sol to photons cm-2 s-1 nm-1 for binning
 	sol_binned=sol_binned/0.05
+	#sol_binned=1E20*sol_binned
 	sol_bin_width=np.zeros(len(lambda_bin))
 	sol_bin_width[0]=2
 	sol_bin_width[len(lambda_bin)-1]=5
@@ -58,13 +59,6 @@ def extract_csec(heights):
 	for i in range(len(key)):
 		constants[key[i]]=vals[i]
 	return constants
-def ncsave(height,species,species_arr):
-	dataset=Dataset('netcdf/'+species+'.nc','w',format='NETCDF4')
-	dataset.createDimension('height',len(height))
-	heights=dataset.createVariable('height',np.float32,('height',))
-	heights[:]=height
-	spec=dataset.createVariable(species,np.float32,('height',))
-	spec[:]=species_arr
 def savetonetcdf(constants,d1defs,d1,d3):
 	height=constants['heights']
 	file1=Dataset('netcdf/results.nc','w',format='NETCDF4')

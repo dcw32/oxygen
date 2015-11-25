@@ -12,8 +12,8 @@ def altconc(constants,o3,o3_running):
         du=o3_running/2.69E16
         du=int(round(du))
         axis.text(0.95,0.95,str(du)+" DU",horizontalalignment='right',verticalalignment='top',transform=axis.transAxes)
-        plt.title('Steady State Chapman - PAL Oxygen')
-        plt.savefig('ozone.png')
+        plt.title('Steady State Chapman - PAL Oxygen Reduced Pressure')
+        plt.savefig('ozone_lowpressure.png')
 	plt.close()
 def linoxyoz(constants):
 	ratios=np.linspace(0.01,1.00,100)
@@ -77,6 +77,36 @@ def inter_plot(o3,J_o2,J_o3,constants):
 		ratio=so2.val
                 constants['M_surf']=2.5E19*(ratio+0.79)
 		constants['M']=constants['M_surf']*np.exp(-constants['heights']/constants['H'])
+                o3,o2,o,J_o2,J_o3,o3_running=steady(constants,False)
+                m.set_ydata(J_o2*1E10)
+                l.set_ydata(o3/1E12)
+                n.set_ydata(J_o3*1E3)
+                du=o3_running/2.69E16
+                #ax0.annotate(str(int(round(du))), xy=(0.99,0.01),xycoords='axes fraction',horizontalalignment='right', verticalalignment='bottom')
+                fig.canvas.draw_idle()
+        so2.on_changed(update)
+        plt.show()
+def inter_plot2(o3,J_o2,J_o3,constants):
+        fig, (ax2,ax1,ax0) = plt.subplots(3, sharex=True)
+        #fig1=plt.subplots()
+        plt.subplots_adjust(bottom=0.25)
+        ax0.set_xlabel('Height / km')
+        ax0.set_ylabel('Ozone / 10^-12 cm-3')
+        ax0.set_ylim([0,12])
+        ax1.set_ylabel('JO2 / 10^10 s-1')
+        ax2.set_ylabel('JO3 / 10^3 s-1')
+        l,=ax0.plot(constants['heights'],o3/1E12)
+        m,=ax1.plot(constants['heights'],J_o2*1E10,color='red')
+        n,=ax2.plot(constants['heights'],J_o3*1E3,color='purple')
+        #ann=txt.Annotation(str(int(round(du))), xy=(50,10),xycoords='data')            
+        #ax0.add_artist(ann)
+        #Sets up sliders
+        axo2=plt.axes([0.25,0.1,0.65,0.03],axisbg='lightgoldenrodyellow')
+        so2=Slider(axo2, 'O\mathrm{_{2}}', 0.9, 1.1, valinit=1.0)
+        #Updates graphs based on slider value
+        def update(val):
+                ratio=so2.val
+                constants['sol']=constants['soln']*ratio
                 o3,o2,o,J_o2,J_o3,o3_running=steady(constants,False)
                 m.set_ydata(J_o2*1E10)
                 l.set_ydata(o3/1E12)

@@ -82,7 +82,7 @@ def solve(constants):
                 *rates[photo[rxno,1]]
    return g
 # Set up times
-  t=np.linspace(0,5.174E6,5.174E6)
+  t=np.linspace(0,5.174E8/60.,5.174E8/3600.)
 #solution provides a time series, take the final value
   soln,hi=odeint(f,d1[:,i],t,full_output=1)
   soln=soln[len(t)-1,:]
