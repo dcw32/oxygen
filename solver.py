@@ -10,6 +10,8 @@ from j_rates import j
 def solve(constants):
  o2_running=0
  o3_running=0
+ constants['M_surf']=2.5E19*(constants['ratio']+0.79)
+ constants['M']=constants['M_surf']*np.exp(-constants['heights']/constants['H'])
  d1defs=np.genfromtxt("species.dat",dtype='str',skiprows=2)
  bimol=np.genfromtxt("bimol.dat",dtype='str',skiprows=2)
  photo=np.genfromtxt("photol.dat",dtype='str',skiprows=2)

@@ -102,11 +102,11 @@ def inter_plot2(o3,J_o2,J_o3,constants):
         #ax0.add_artist(ann)
         #Sets up sliders
         axo2=plt.axes([0.25,0.1,0.65,0.03],axisbg='lightgoldenrodyellow')
-        so2=Slider(axo2, 'O\mathrm{_{2}}', 0.9, 1.1, valinit=1.0)
+        so2=Slider(axo2, 'O\mathrm{_{2}}', 0.05, 0.35, valinit=0.21)
         #Updates graphs based on slider value
         def update(val):
                 ratio=so2.val
-                constants['sol']=constants['soln']*ratio
+                constants['ratio_copy']=ratio
                 o3,o2,o,J_o2,J_o3,o3_running=steady(constants,False)
                 m.set_ydata(J_o2*1E10)
                 l.set_ydata(o3/1E12)
