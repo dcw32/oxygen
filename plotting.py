@@ -12,8 +12,8 @@ def altconc(constants,o3,o3_running):
         du=o3_running/2.69E16
         du=int(round(du))
         axis.text(0.95,0.95,str(du)+" DU",horizontalalignment='right',verticalalignment='top',transform=axis.transAxes)
-        plt.title('Steady State Chapman - PAL Oxygen Reduced Pressure')
-        plt.savefig('ozone_lowpressure.png')
+        plt.title('Steady State Chapman - PAL Oxygen')
+        plt.savefig('ozone.png')
 	plt.close()
 def linoxyoz(constants):
 	ratios=np.linspace(0.01,1.00,100)
