@@ -25,13 +25,13 @@ def linoxyoz(constants):
 	        o3,o2,o,J_o2,J_o3,o3_running=steady(constants,False)
 	        du=o3_running
 	        du=o3_running/2.69E16
-	        ratio=constants['ratio']/0.21
-	        plt.scatter(ratio,du,marker="x",color='purple')
-	x,y=(1,1),(0,1000)
+	        rat=100*constants['ratio']
+	        plt.scatter(rat,du,marker=".",color='navy')
+	x,y=(21,21),(0,1100)
 	plt.plot(x,y,color='k')
-	ax.set_xlim([0,5])
-	ax.set_ylim([550,800])
-	plt.xlabel(r'Oxygen Content (PAL)')
+	ax.set_xlim([0,80])
+	ax.set_ylim([550,1100])
+	plt.xlabel(r'Oxygen Content / %')
 	plt.ylabel(r'Ozone Column / DU')
 	plt.savefig('dobson.png')
 	plt.close()
@@ -45,7 +45,7 @@ def logoxyoz(constants):
 	        o3,o2,o,J_o2,J_o3,o3_running=steady(constants,False)
 	        du=o3_running
 	#       du=o3_running/2.69E16
-	        ratio=constants['ratio']/0.21
+	        ratio=constants['ratio']
 	        plt.scatter(ratio,du,marker="x",color='r')
 	ax.set_xscale('log')
 	#ax.set_xlim([0,1])

@@ -21,7 +21,7 @@ def steady(constants,init):
 	o2_running=0
 	o3_running=0
 	for i in range(constants['nlevs']):
-        	o2[i]=constants['ratio_copy']*constants['M'][i]
+        	o2[i]=constants['ratio']*constants['M'][i]
 	        optical_depth=constants['o2_c']*o2_running+constants['o3_c']*o3_running
 	        I_factor=np.exp(-optical_depth)
         	I=np.array(constants['sol']*I_factor)

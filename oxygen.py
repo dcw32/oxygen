@@ -19,6 +19,7 @@ print "STARTING PROGRAM OXYGEN"
 
 # Oxygen ratio
 ratio = 0.21
+print ratio
 # Steady state mode - can set up 'initial values' for chem scheme
 steadystate = True
 # Plotting scripts - plots oxygen vs ozone for a range of oxygen vals
@@ -66,6 +67,8 @@ def main():
 	if steadystate==True:
 		print "CALCULATING STEADY STATE OZONE COLUMN (CHAPMAN)"
 		o3,o2,o,J_o2,J_o3,o3_running=steady(constants,True)
+		print "J(O2)="+str(J_o2[40])
+		print "J(O3)="+str(J_o3[40])
 		altconc(constants,o3,o3_running)
 
 	#Interactive plot of ozone vs o2
