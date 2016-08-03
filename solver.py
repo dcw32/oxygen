@@ -1,11 +1,18 @@
+######################################################################################################
+# NUMERICAL SOLVER
+# This uses lsoda to solve the N-dimensional ODE for the chemical system
+# 
+######################################################################################################
 import numpy as np
-from scipy.integrate import odeint
+#from scipy.integrate import odeint
 from netCDF4 import Dataset
 import sys
 import os
+import scipy.integrate as spi
 
 from k_rates import k
 from j_rates import j
+from grid import regrid
 
 def solve(constants):
  o2_running=0
@@ -18,13 +25,18 @@ def solve(constants):
  nspec=len(d1defs[:,0])
  d1=np.zeros([len(d1defs[:,0]),constants['nlevs']])
  file=Dataset('netcdf/initial.nc')
+##                                                                   ##
+# This Section Initialises Arrays To Your Input File.                 #
+# Any Species With No Value In Input Are Set To Zero                  #
+##                                                                   ##
  for i in range(len(d1defs[:,0])):
   #if os.path.isfile('netcdf/'+d1defs[i,0]+'.nc')==True:
   #file=Dataset('netcdf/initial.nc')
-  species=file.variables[d1defs[i,0]][:]
+  try:
+   species=file.variables[d1defs[i,0]][:]
+  except:
+   species=np.zeros(constants['nlevs'])
   d1[i,:]=species
-  #else:
-  # sys.exit("SPECIES "+d1defs[i,0]+" IS NOT INITIALISED")
  for i in range(len(bimol[:,0])):
   for a in [0,1,3,4,5,6]:
    if bimol[i,a] in d1defs[:,0] or bimol[i,a]=='X':
@@ -51,7 +63,7 @@ def solve(constants):
   for a in range(len(photo)):
    rates[photo[a,1]]=j(I,photo[a,1],constants)
 # Define function for chemical tendencies
-  def f(y, t):
+  def f(y,t):
    g=np.empty(nspec)
 # Loop through chemical species
    for spec in range(nspec):
@@ -84,11 +96,19 @@ def solve(constants):
                 *rates[photo[rxno,1]]
    return g
 # Set up times
-  t=np.linspace(0,5.174E8/60.,5.174E8/3600.)
+#  t=np.linspace(0,5.174E8/60.,5.174E8/3600.)
+  #t=np.arange(60*60*24*360*10,step=60*60)
 #solution provides a time series, take the final value
-  soln,hi=odeint(f,d1[:,i],t,full_output=1)
-  soln=soln[len(t)-1,:]
+  t_start=0.
+  t_step1=60.
+  t_step2=60.*60.*6.
+  t_end=t_step2*24.*360.*5.
+  t1=np.arange(t_start, t_end/100., t_step1)
+  t2=np.arange(t_start+t_end/100., t_end, t_step2)
+  t_interval=np.concatenate((t1,t2),axis=0)
+  soln,hi=spi.odeint(f,d1[:,i],t_interval,full_output=1)
+  soln=soln[len(t_interval)-1,:]
   d3[:,i]=soln
-  o3_running=o3_running+d3[np.where(d1defs=='O3')[0][0],i]*constants['box_h']
-  o2_running=o2_running+d1[np.where(d1defs=='O2')[0][0],i]*constants['box_h']
+  o3_running=o3_running+d3[np.where(d1defs=='O3')[0][0],i]*constants['box_h'][i]
+  o2_running=o2_running+d1[np.where(d1defs=='O2')[0][0],i]*constants['box_h'][i]
  return d1defs,d1,d3
